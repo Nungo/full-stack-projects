@@ -1,0 +1,13 @@
+/* src/assets/global.css */
+body {
+    background: url('/welcome-kota-king.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
