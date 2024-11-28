@@ -1,54 +1,85 @@
-import React, { useState } from 'react';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import SearchBar from './components/SearchBar';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Box, CssBaseline } from '@mui/material';
+import Navbar from './components/Navbar';
 import JobList from './components/JobList';
-import axios from 'axios';
-import { Container } from '@mui/material';
+import JobDetails from './components/JobDetails';
+import PostJob from './components/PostJob';
+import SearchBar from './components/SearchBar';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import EmployerDashboard from './components/dashboard/EmployerDashboard';
+import JobSeekerDashboard from './components/dashboard/JobSeekerDashboard';
+import ProfileManagement from './components/profile/ProfileManagement';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#ff4081',
-    },
-  },
-});
-
-const App = () => {
-  const [jobs, setJobs] = useState([]);  // State for job results
-  const [loading, setLoading] = useState(false);  // State for loading indicator
-
-  // Function to handle the search and API call
-  const handleSearch = async (query) => {
-    try {
-      setLoading(true);  // Set loading state
-      const response = await axios.get(`http://localhost:5000/api/jobs`, {
-        params: { query },
-      });
-
-      // Log the data received from the backend
-      console.log('Jobs received from backend:', response.data);
-
-      setJobs(response.data);  // Update job results in the state
-      setLoading(false);  // Stop loading indicator
-    } catch (error) {
-      console.error('Error fetching job listings:', error);
-      setLoading(false);  // Stop loading indicator in case of error
-    }
-  };
-
+function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Container>
-        {/* SearchBar triggers search and passes query */}
-        <SearchBar onSearch={handleSearch} loading={loading} />
-        {/* JobList displays the jobs and loading state */}
-        <JobList jobs={jobs} loading={loading} />
-      </Container>
-    </ThemeProvider>
+    <AuthProvider>
+      <Router>
+        <CssBaseline />
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Navbar />
+          <Box component="main" sx={{ flexGrow: 1 }}>
+            {/* Only show SearchBar on the home page */}
+            <Routes>
+              <Route path="/" element={
+                <>
+                  <SearchBar />
+                  <JobList />
+                </>
+              } />
+
+              {/* Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
+              {/* Public Routes */}
+              <Route path="/jobs/:id" element={<JobDetails />} />
+
+              {/* Protected Routes - Employer */}
+              <Route
+                path="/employer/dashboard"
+                element={
+                  <ProtectedRoute roles={['employer']}>
+                    <EmployerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/post-job"
+                element={
+                  <ProtectedRoute roles={['employer']}>
+                    <PostJob />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Protected Routes - Job Seeker */}
+              <Route
+                path="/jobseeker/dashboard"
+                element={
+                  <ProtectedRoute roles={['jobseeker']}>
+                    <JobSeekerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Protected Routes - All Users */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfileManagement />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Box>
+        </Box>
+      </Router>
+    </AuthProvider>
   );
-};
+}
 
 export default App;

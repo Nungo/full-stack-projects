@@ -1,33 +1,41 @@
-import React, {useState} from 'react';
-import {TextField, Button, CircularProgress} from '@mui/material';
+import React, { useState } from 'react';
+import { Paper, InputBase, IconButton, Box } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
-const SearchBar = ({onSearch, loading}) => {
-    const [query, setQuery] = useState('');
+const SearchBar = () => {
+  const [query, setQuery] = useState('');
 
-    const handleSearch = () => {
-        if(query.trim()) {
-            onSearch(query);
-        }
-    };
-    return(
-        <div style ={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
-            <TextField
-            label="Search Jobs"
-            variant="outlined"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={{marginRight: '10px', width: '300px'}}
-            />
-            <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSearch}
-            disabled={loading}
-            >
-                {loading ? <CircularProgress size={24} /> : 'Search'}
-            </Button>
-        </div>
-    );
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle search logic here
+    console.log('Searching for:', query);
+  };
+
+  return (
+    <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
+      <Paper
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{
+          p: '2px 4px',
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: 600,
+          mx: 'auto'
+        }}
+      >
+        <InputBase
+          sx={{ ml: 1, flex: 1 }}
+          placeholder="Search jobs..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <IconButton type="submit" sx={{ p: '10px' }}>
+          <SearchIcon />
+        </IconButton>
+      </Paper>
+    </Box>
+  );
 };
 
 export default SearchBar;
